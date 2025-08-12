@@ -1,0 +1,13 @@
+// restful api-json 
+
+1) GET/ users - List all users
+
+1.1) GET/users/1 - get the user with Id 1
+1.2) GET/user/2 - get the user with id 2
+
+2) POST/users - create new user
+
+3) PATCH/users/id - edit the user with ID 1
+
+4) DELETE/users/1 - delete the user with ID 1
+
