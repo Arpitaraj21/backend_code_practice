@@ -1,0 +1,19 @@
+1) User Registration System
+
+Create a backend for:
+
+register user
+login
+update profile
+delete account
+Practice tasks
+Design user schema
+Add validation for email
+Password min length
+createdAt / updatedAt
+unique username
+role field
+
+👉 Think:
+
+name, email, password, role, profileImage
