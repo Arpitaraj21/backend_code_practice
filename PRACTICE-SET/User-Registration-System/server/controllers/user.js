@@ -1,19 +1,17 @@
 import bcrypt, { hash } from "bcrypt";
 import { User } from "../models/Users";
-import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-
-dotenv.config();
+import dotenv from "dotenv";
 
 const handleSignup = async (req, res) => {
-  const { name, email, password, role, profileImage } = req.body;
+  const { name, username, email, password, role, profileImage } = req.body;
 
   const secretKey = process.env.SECRETKEY;
 
   try {
-    const isEixisting = await User.findOne({ email });
+    const isEixistingUser = await User.findOne({ email });
 
-    if (isEixisting) {
+    if (isEixistingUser) {
       return res.status(409).json({
         message: "User already exists!",
       });
@@ -21,22 +19,44 @@ const handleSignup = async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 12);
 
-    const token = await jwt.sign({ name, role }, secretKey, {
-      expiresIn: "1hr",
-    });
-
-    const newUser = await User.createOne({
+    const newUser = await User.create({
       name,
+      username,
       email,
       password: hashPassword,
       role,
       profileImage,
     });
 
+    const accessToken = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      secretKey,
+      { expiresIn: "15m" },
+    );
+
+    const refreshToken = jwt.sign({ id: newUser._id }, secretKey, {
+      expiresIn: "7d",
+    });
+
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 15 * 60 * 1000,
+      sameSite: "lax",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+    });
+
     return res.status(201).json({
       message: "User created successfully!",
       user: newUser,
-      token,
+      accessToken,
       sucess: true,
     });
   } catch (error) {
@@ -50,17 +70,19 @@ const handleSignup = async (req, res) => {
 };
 
 const handleLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body;
 
   try {
-    if (!email || !password) {
+    if (!identifier || !password) {
       return res.status(401).json({
-        message: "Email and Password is required!",
+        message: "Email/username and Password is required!",
         success: false,
       });
     }
 
-    const isUserExisting = await User.findOne({ email });
+    const isUserExisting = await User.findOne({
+      $or: [{ email: identifier.toLowerCase() }, { username: identifier }],
+    });
 
     if (!isUserExisting) {
       return res.status(400).json({
@@ -81,13 +103,15 @@ const handleLogin = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, secretKey, {
-      expiresIn: "1hr",
-    });
+    const accessToken = generateAccessToken(isUserExisting);
+    const refreshToken = generateRefreshToken();
+
+    isUserExisting.refreshToken = refreshToken;
+    await User.save();
 
     return res.status(200).json({
       message: "Login successful",
-      token,
+      accessToken,
       success: true,
     });
   } catch (error) {
