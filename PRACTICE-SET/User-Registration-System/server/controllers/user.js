@@ -1,13 +1,14 @@
 import bcrypt, { hash } from "bcrypt";
-import { User } from "../models/Users";
+import User from "../models/Users/users.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import multer from "multer";
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 
 dotenv.config();
 
 // Sign up
-const handleSignup = async (req, res) => {
+export const handleSignup = async (req, res) => {
   const { name, username, email, password, role, profileImage } = req.body;
 
   const secretKey = process.env.SECRETKEY;
@@ -61,22 +62,23 @@ const handleSignup = async (req, res) => {
       message: "User created successfully!",
       user: newUser,
       accessToken,
-      sucess: true,
+      success: true,
     });
   } catch (error) {
     console.log("signup error", error);
     return res.json({
       status: 500,
       message: "Internal Server Error!",
-      sucess: false,
+      success: false,
     });
   }
 };
 
 // login
-const handleLogin = async (req, res) => {
+export const handleLogin = async (req, res) => {
   const { identifier, password } = req.body;
 
+  console.log("req body", req.body);
   try {
     if (!identifier || !password) {
       return res.status(401).json({
@@ -92,7 +94,7 @@ const handleLogin = async (req, res) => {
     if (!isUserExisting) {
       return res.status(400).json({
         message: "No user available",
-        sucess: false,
+        success: false,
       });
     }
 
@@ -109,10 +111,10 @@ const handleLogin = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(isUserExisting);
-    const refreshToken = generateRefreshToken();
+    const refreshToken = generateRefreshToken(isUserExisting);
 
     isUserExisting.refreshToken = refreshToken;
-    await User.save();
+    await isUserExisting.save();
 
     return res.status(200).json({
       message: "Login successful",
@@ -123,16 +125,18 @@ const handleLogin = async (req, res) => {
     console.log("error in login ", error);
     return res.status(500).json({
       message: "Internal Server Error!",
-      sucess: false,
+      success: false,
     });
   }
 };
 
 // edit profile
 
-const handleProfileEdit = async (req, res) => {
+export const handleProfileEdit = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
+
+    const token = authHeader.split(" ")[1];
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
@@ -148,12 +152,10 @@ const handleProfileEdit = async (req, res) => {
       });
     }
 
-    const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.SECRETKEY);
     const userId = decoded.id;
 
-    const { name, username, email, password, role, profileImage0 } = req.body;
+    const { name, username, email, password, role, profileImage } = req.body;
 
     let updatedFields = {
       name,
@@ -177,7 +179,7 @@ const handleProfileEdit = async (req, res) => {
       });
     }
     return res.status(200).json({
-      messgae: "Profile updated sucessfully",
+      message: "Profile updated successfully",
       User: updatedUser,
       success: true,
     });
@@ -189,5 +191,3 @@ const handleProfileEdit = async (req, res) => {
     });
   }
 };
-
-export default { handleSignup, handleLogin, handleProfileEdit };
