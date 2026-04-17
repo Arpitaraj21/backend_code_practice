@@ -2,7 +2,11 @@ import bcrypt, { hash } from "bcrypt";
 import { User } from "../models/Users";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import multer from "multer";
 
+dotenv.config();
+
+// Sign up
 const handleSignup = async (req, res) => {
   const { name, username, email, password, role, profileImage } = req.body;
 
@@ -69,6 +73,7 @@ const handleSignup = async (req, res) => {
   }
 };
 
+// login
 const handleLogin = async (req, res) => {
   const { identifier, password } = req.body;
 
@@ -122,4 +127,67 @@ const handleLogin = async (req, res) => {
     });
   }
 };
-export default { handleSignup, handleLogin };
+
+// edit profile
+
+const handleProfileEdit = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        success: false,
+      });
+    }
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        success: false,
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.SECRETKEY);
+    const userId = decoded.id;
+
+    const { name, username, email, password, role, profileImage0 } = req.body;
+
+    let updatedFields = {
+      name,
+      username,
+      email,
+      profileImage,
+    };
+
+    if (password) {
+      updatedFields.password = await bcrypt.hash(password, 12);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+        status: false,
+      });
+    }
+    return res.status(200).json({
+      messgae: "Profile updated sucessfully",
+      User: updatedUser,
+      success: true,
+    });
+  } catch (error) {
+    console.log("error in editing the profile", error);
+    return res.status(200).json({
+      message: "Internal server error!",
+      success: false,
+    });
+  }
+};
+
+export default { handleSignup, handleLogin, handleProfileEdit };

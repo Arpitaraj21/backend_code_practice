@@ -1,0 +1,19 @@
+# Your current login controller handles:
+
+-> email + password → check DB → compare bcrypt → issue JWT
+
+# OAuth flow is:
+
+-> Google/GitHub login → provider gives user info → backend verifies → create/find user → issue your JWT
+
+// --------- Big Picture Flow for file uploading to S3 -------- //
+
+Frontend (FormData)
+↓
+Multer (memory storage)
+↓
+Upload to S3
+↓
+Get image URL
+↓
+Save URL in DB
