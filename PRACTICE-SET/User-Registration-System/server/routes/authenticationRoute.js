@@ -3,8 +3,9 @@ import {
   handleSignup,
   handleLogin,
   handleProfileEdit,
-} from "../controllers/user";
-import verifyToken from "../middlewares/authorization";
+} from "../controllers/user.js";
+
+import { verifyToken } from "../middlewares/authorization.js";
 
 const router = express.Router();
 
