@@ -138,6 +138,8 @@ export const handleProfileEdit = async (req, res) => {
 
     const token = authHeader.split(" ")[1];
 
+    console.log("token", token);
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "Unauthorized",
@@ -191,3 +193,53 @@ export const handleProfileEdit = async (req, res) => {
     });
   }
 };
+
+
+export const handleDeleteProfile = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer")){
+      return res.status(401).json({
+        message: "Unauthorized",
+        status: false
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    if(!token){
+      return res.status(401).json({
+        message: 'Unauthorized!',
+        status: false,
+      })
+    }
+
+    const decoded = jwt.verify(token, process.env.SECRETKEY);
+    const userId = decoded.id;
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser){
+      return res.status(404).json({
+        message: 'User not found!',
+        status: false,
+      })
+    }
+
+    res.clearCookies('accessToken');
+    res.clearCookies('refreshToken');
+
+    return res.status(200).json({
+      message: 'User successfully delete',
+      success: false
+    })
+    
+  } catch (error) {
+    console.log("error in deleting the profile", error);
+    return res.status(500).json({
+      message: "Internal server error!",
+      success: false
+    })
+  }
+}
