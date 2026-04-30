@@ -112,6 +112,9 @@ export default function Signup() {
                         <Button variant="contained" sx={{ mt: 2 }} type="submit">
                             Submit
                         </Button>
+
+                        <Typography sx={{ textAlign: 'center', fontSize: '15px', fontWeight: '500', zIndex: 2 }}>Already have an account? <a href="/login" style={{ color: '#1464db' }}>Login</a></Typography>
+
                     </Paper>
                 </Box>
             </FormProvider>

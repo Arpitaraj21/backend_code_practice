@@ -1,8 +1,9 @@
-import { Paper, TextField, Box, Button, Typography } from "@mui/material";
+import { Paper, TextField, Box, Button, Typography, Link } from "@mui/material";
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance, { endpoints } from "../utils/axios";
 import PositionedSnackbar from "../utils/snackbar";
 
@@ -23,6 +24,7 @@ export default function Login() {
         password: '',
     })
     const [snackbar, setSnackbar] = useState({ open: false, message: '', success: false });
+    const navigate = useNavigate();
    
     const LoginSchema = Yup.object({
         identifier: Yup.string()
@@ -68,7 +70,9 @@ export default function Login() {
             const response = await axiosInstance.post(endpoints.login, data);
 
             console.log("Login successful");
+            localStorage.setItem('accessToken', response.data.accessToken);
             setSnackbar({ open: true, message: response.data.message, success: true });
+            setTimeout(() => navigate('/dashboard'), 1000);
         } catch (error) {
             console.error("Login failed:", error);
             setSnackbar({ open: true, message: 'Login failed!', success: false });
@@ -118,6 +122,8 @@ export default function Login() {
                             <Button variant="contained" sx={{ mt: 2 }} type="submit">
                                 Submit
                             </Button>
+
+                            <Typography sx={{ textAlign: 'center', fontSize: '15px', fontWeight: '500', zIndex: 2}}>Don't have an account? <a href="/signup" style={{color: '#1464db'}}>Sign up</a></Typography>
                         </Paper>
                     </Box>
                 </FormProvider>
