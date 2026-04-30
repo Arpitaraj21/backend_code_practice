@@ -1,4 +1,4 @@
-import { Paper, TextField, Box, Button, Typography, Link } from "@mui/material";
+import { Paper, TextField, Box, Button, Typography } from "@mui/material";
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -12,10 +12,6 @@ export interface User {
     password: string,
 }
 
-interface UserProps {
-    initialData?: User;
-    onSubmit: (data: User) => Promise<void>
-}
 
 export default function Login() {
 

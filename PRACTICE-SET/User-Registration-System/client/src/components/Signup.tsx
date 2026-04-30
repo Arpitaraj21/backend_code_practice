@@ -13,11 +13,6 @@ export interface User {
     password: string,
 }
 
-interface UserProps {
-    initialData?: User;
-    onSubmit: (data: User) => Promise<void>
-}
-
 export default function Signup() {
 
     const navigate = useNavigate();
@@ -44,7 +39,7 @@ export default function Signup() {
         }
     })
 
-    const { handleSubmit, control, register, watch, setValue, setError, clearErrors, formState } = methods;
+    const { handleSubmit, register } = methods;
 
     const handleFormSubmit = async (data: User) => {
         try {
