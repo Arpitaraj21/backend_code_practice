@@ -1,3 +1,4 @@
+import express from "express";
 import {
   handleProfileEdit,
   handleDeleteProfile,
@@ -8,10 +9,10 @@ import { verifyToken } from "../middlewares/authorization.js";
 
 const router = express.Router();
 
-router.post("/edit-profile", handleProfileEdit, verifyToken);
+router.post("/edit-profile", verifyToken, handleProfileEdit);
 
-router.get("/profile-details", handleGetProfileDetails, verifyToken);
+router.get("/profile-details", verifyToken, handleGetProfileDetails);
 
-router.post('/delete-profile',handleDeleteProfile, verifyToken);
+router.post('/delete-profile',verifyToken, handleDeleteProfile);
 
 export default router;

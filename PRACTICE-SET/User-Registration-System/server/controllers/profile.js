@@ -124,28 +124,28 @@ export const handleDeleteProfile = async (req, res) => {
 
 
 export const handleGetProfileDetails = async (req, res) => {
-    try{
-        const userId = req.user.id;
+    try {
 
-        const user = await User.findById(userId).select("-password -refreshToekn");
-        if(!user){
-            res.status(404).json({
+        const userId = req.user.id;
+        const user = await User.findById(userId).select("-password -refreshToken");
+
+        if (!user) {
+            return res.status(404).json({
                 message: "User not found!",
-                success: false
-            })
+                success: false,
+            });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "User data",
             success: true,
-            user
+            user,
         });
-    }
-    catch(error){
-        console.log("error in fecthing the profile details", error)
-        res.status(500).json({
-            message: 'Internal server error!',
-            success: false
-        })
+    } catch (error) {
+        console.log("error in fetching the profile details", error);
+        return res.status(500).json({
+            message: "Internal server error!",
+            success: false,
+        });
     }
 }

@@ -5,6 +5,7 @@ import AuthLayout from "./layout/AuthLayout";
 import MainLayout from './layout/MainLayout'
 import Dashboard from "./components/Dashboard";
 import ProtectedRoutes from "./ProtectedRoutes";
+import Profile from "./components/Profile";
 export const router = createBrowserRouter([
     {
         // default redirect: when user tries to access / send them to /login
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
         ),
         children: [
             { path: "dashboard", element: <Dashboard /> },
+            { path: "account", element: <Profile/>}
         ]
     }
 ])
