@@ -9,9 +9,9 @@ import { verifyToken } from "../middlewares/authorization.js";
 
 const router = express.Router();
 
-router.post("/edit-profile", verifyToken, handleProfileEdit);
-
 router.get("/profile-details", verifyToken, handleGetProfileDetails);
+
+router.post("/edit-profile", verifyToken, handleProfileEdit);
 
 router.post('/delete-profile',verifyToken, handleDeleteProfile);
 
