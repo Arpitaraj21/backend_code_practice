@@ -8,9 +8,7 @@ export default function MainLayout() {
         <Grid container spacing={2}>
             <Grid size={{xs: 12, md: 12}}>
                 {/* Header */}
-                <Typography>
-                    Hello User
-                </Typography>
+               
 
                 <Dashboard/>
             </Grid>

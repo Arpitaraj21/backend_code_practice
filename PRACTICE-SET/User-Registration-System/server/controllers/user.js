@@ -50,12 +50,14 @@ export const handleSignup = async (req, res) => {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
       sameSite: "lax",
+      path: "/",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: "lax",
+      path: "/",
     });
 
     return res.status(201).json({
@@ -120,6 +122,14 @@ export const handleLogin = async (req, res) => {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
       sameSite: "lax",
+      path: "/",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+      path: "/",
     });
     
     
@@ -138,43 +148,29 @@ export const handleLogin = async (req, res) => {
 };
 
 
-
-// get profile details
-export const handleGetProfileDetails = async (req, res) => {
+export const handleLogout = async (req, res ) => {
   try {
-    const authHeader = req.headers.authorization;
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        message: "Unauthorized",
-        success: false,
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.SECRETKEY);
-    const userId = decoded.id;
-
-    // return all fields except password and refreshToken
-    const user = await User.findById(userId).select("-password -refreshToken");
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-        success: false,
-      });
-    }
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
 
     return res.status(200).json({
-      message: "User data",
+      message: "Logout successful",
       success: true,
-      user,
     });
   } catch (error) {
-    console.log("error in fetching the profile details", error);
+    console.log("error in logout handler", error);
     return res.status(500).json({
-      message: "Internal server error!",
+      message: "Internal Server Error!",
       success: false,
-    });
+    })
   }
-};
+}

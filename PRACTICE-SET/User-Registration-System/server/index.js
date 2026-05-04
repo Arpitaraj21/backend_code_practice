@@ -21,11 +21,11 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
+app.use(cookieParser());
 
 connectDb();
 app.use("/api", userRouter);
 app.use("/api", profileRouter);
-app.use(cookieParser());
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

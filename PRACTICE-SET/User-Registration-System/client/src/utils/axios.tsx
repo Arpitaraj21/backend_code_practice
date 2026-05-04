@@ -4,19 +4,9 @@ import { HOST_API } from '../config-global';
 
 
 const axiosInstance = axios.create({
-    baseURL: HOST_API
+    baseURL: HOST_API,
+    withCredentials: true,
 });
-
-axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
 
 axiosInstance.interceptors.response.use(
     (res) => res,
@@ -28,5 +18,6 @@ export default axiosInstance;
 export const endpoints = {
     login: '/login',
     signup: '/signup',
+    logout: '/logout',
     profileDetails: '/profile-details',
 }

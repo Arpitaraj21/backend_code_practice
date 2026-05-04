@@ -12,18 +12,7 @@ dotenv.config();
 
 export const handleProfileEdit = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-
-        const token = authHeader.split(" ")[1];
-
-        console.log("token", token);
-
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                message: "Unauthorized",
-                success: false,
-            });
-        }
+        const token = req.cookies?.accessToken;
 
         if (!token) {
             return res.status(401).json({
@@ -75,22 +64,13 @@ export const handleProfileEdit = async (req, res) => {
 
 export const handleDeleteProfile = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
+        const token = req.cookies?.accessToken;
 
-        if (!authHeader || !authHeader.startsWith("Bearer")) {
+        if (!token) {
             return res.status(401).json({
                 message: "Unauthorized",
                 status: false
             });
-        }
-
-        const token = authHeader.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({
-                message: 'Unauthorized!',
-                status: false,
-            })
         }
 
         const decoded = jwt.verify(token, process.env.SECRETKEY);
@@ -105,8 +85,8 @@ export const handleDeleteProfile = async (req, res) => {
             })
         }
 
-        res.clearCookies('accessToken');
-        res.clearCookies('refreshToken');
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
 
         return res.status(200).json({
             message: 'User successfully delete',
@@ -127,6 +107,7 @@ export const handleGetProfileDetails = async (req, res) => {
     try {
 
         const userId = req.user.id;
+        console.log("userId", userId);
         const user = await User.findById(userId).select("-password -refreshToken");
 
         if (!user) {

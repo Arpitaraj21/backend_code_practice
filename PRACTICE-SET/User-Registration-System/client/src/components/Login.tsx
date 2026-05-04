@@ -66,7 +66,7 @@ export default function Login() {
             const response = await axiosInstance.post(endpoints.login, data);
 
             console.log("Login successful");
-            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('accessToken', 'true');
             setSnackbar({ open: true, message: response.data.message, success: true });
             setTimeout(() => navigate('/dashboard'), 1000);
         } catch (error) {
