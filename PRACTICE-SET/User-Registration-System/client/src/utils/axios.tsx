@@ -20,4 +20,6 @@ export const endpoints = {
     signup: '/signup',
     logout: '/logout',
     profileDetails: '/profile-details',
+    editProfile: '/edit-profile',
+    deleteProfile: 'delete-profile',
 }
