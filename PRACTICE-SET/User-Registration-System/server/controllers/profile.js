@@ -36,33 +36,27 @@ export const handleGetProfileDetails = async (req, res) => {
 
 export const handleUpdateProfileDetails = async (req, res) => {
     try {
-        const authId = req.cookies?.accessToken;
-
-        if (!authId) {
-            return res.status(401).json({
-                message: "Unauthorized access!",
-                success: false
-            })
-        }
-
-        const decoded = jwt.verify(authId, process.env.SECRETKEY);
-        const userId = decoded.id;
+        const userId = req.user.id;
 
         const { name, username, password, profileImage } = req.body;
-        let updatedFields = {
-            name,
-            username,
-            password,
-            profileImage
+        let updatedFields = {};
+
+        if (name) updatedFields.name = name;
+        if (username) updatedFields.username = username;
+        if (profileImage) updatedFields.profileImage = profileImage;
+        if (password) updatedFields.password = await bcrypt.hash(password, 12);
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, { new: true }).select("-password -refreshToken");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
-        if (password) {
-            updatedFields.password = await User.findByIdAndUpdate(userId, updatedFields, {
-                newUser: true
-            })
-        }
-
-
+        return res.status(200).json({
+            message: "Profile updated successfully",
+            user: updatedUser,
+            success: true
+        });
     } catch (error) {
         console.log("error in update profile controller", error);
         res.status(500).json({
