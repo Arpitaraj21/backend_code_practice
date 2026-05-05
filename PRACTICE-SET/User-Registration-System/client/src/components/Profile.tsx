@@ -3,7 +3,7 @@ import axiosInstance from "../utils/axios";
 import { useState, useEffect } from "react";
 import { icons } from "../utils/Icons";
 import PositionedSnackbar from "../utils/snackbar";
-import BasicModal from "./SettingsModal";
+import SettingsModal from "./SettingsModal";
 
 interface UserData {
     name: string;
@@ -65,7 +65,7 @@ export default function Profile() {
                     />
                 </Box>
                 
-                <BasicModal open={openModal} handleClose={handleCloseModal} />
+                <SettingsModal open={openModal} handleClose={handleCloseModal} aria-labelledby="hello world"/>
 
                 <PositionedSnackbar
                     open={snackbar.open}
