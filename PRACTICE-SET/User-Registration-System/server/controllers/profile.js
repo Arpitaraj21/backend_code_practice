@@ -69,12 +69,9 @@ export const handleUpdateProfileDetails = async (req, res) => {
 
 export const handleDeleteUserProfile = async (req, res) => {
     try {
-        const token = req.headers.authorization;
+        const userId = req.user.id;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.id;
-
-        const deletedUser = await user.findByIdAndDelete(userId);
+        const deletedUser = await User.findByIdAndDelete(userId);
 
         if (!deletedUser) {
             return res.status(401).json({
