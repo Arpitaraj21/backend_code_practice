@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axiosInstance, { endpoints } from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import PositionedSnackbar from "../utils/snackbar";
 
 export interface User {
     name: string,
@@ -61,14 +62,17 @@ export default function EditUserProfile() {
             const resp = await axiosInstance.patch(endpoints.editProfile, data);
             console.log(resp);
             console.log("updated user data successful");
-            navigate('/dashboard');
-            setSnackbar({ open: true, message: "updted", success: true })
+            setSnackbar({ open: true, message: "Profile updated", success: true });
+            setTimeout(() => navigate('/dashboard'), 1500);
 
         } catch (error) {
             console.error("Signup failed:", error);
         }
     }
+
+  
     return (
+        <>
         <form onSubmit={handleSubmit(handleFormSubmit, () => {
             // console.log("form data", formData);
         })}>
@@ -118,13 +122,22 @@ export default function EditUserProfile() {
                             error={!!methods.formState.errors.password}
                             helperText={methods.formState.errors.password?.message}
                         />
-                        <Button variant="contained" sx={{ mt: 2 }} type="submit">
+                        <Button variant="contained" sx={{ mt: 2, gap: 2 }} type="submit">
                             Edit Profile
                         </Button>
+
+                       
                     </Paper>
                 </Box>
             </FormProvider>
         </form>
 
+            <PositionedSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                success={snackbar.success}
+                onClose={() => setSnackbar({ open: false, message: '', success: false })}
+            />
+        </>
     )
 }
